@@ -38,6 +38,8 @@ public class MapsActivity extends AppCompatActivity
         GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnInfoWindowClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ClusterManager.OnClusterItemClickListener<PlayHomeClusterItem>, GoogleMap.OnCameraMoveListener, View.OnClickListener {
 
+    private static final int HISTORY_ACTIVITY_REQUEST_CODE = 0;
+
     public static final String EXTRA_SEARCH_TEXT = "EXTRA_SEARCH_TEXT";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -212,7 +214,7 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onCameraMoveStarted(int reason) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-            userGestured = true;
+            enableSearchMap();
         }
     }
 
@@ -250,7 +252,7 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public boolean onMyLocationButtonClick() {
         // (return false so the camera animates to the user's current position).
-        userGestured = true;
+        enableSearchMap();
         return false;
     }
 
@@ -286,6 +288,30 @@ public class MapsActivity extends AppCompatActivity
 
     private void startHistoryActivity() {
         Intent intent = new Intent(this, HistoryActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, HISTORY_ACTIVITY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case HISTORY_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    double latitude = data.getDoubleExtra("latitude", 0);
+                    double longitude = data.getDoubleExtra("longitude", 0);
+                    defaultLatLng = new LatLng(latitude, longitude);
+                    enableSearchMap();
+                    setCenter();
+                }
+                break;
+            default:
+                System.out.println("not define request code:"+requestCode);
+                break;
+        }
+    }
+
+    private void enableSearchMap() {
+        userGestured = true;
     }
 }

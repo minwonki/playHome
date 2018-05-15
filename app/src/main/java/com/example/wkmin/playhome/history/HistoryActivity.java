@@ -1,5 +1,6 @@
 package com.example.wkmin.playhome.history;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -133,8 +134,11 @@ public class HistoryActivity extends AppCompatActivity implements HistoryContrac
         @Override
         public void onClick(View v) {
             HistoryHome item = (HistoryHome) v.getTag();
-            System.out.println("name:"+item.getName());
-            //TODO : back to MapActivity
+            Intent intent = new Intent();
+            intent.putExtra("latitude", item.getLatitude());
+            intent.putExtra("longitude", item.getLongitude());
+            setResult(RESULT_OK, intent);
+            finish();
         }
     }
 }
